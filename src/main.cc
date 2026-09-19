@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <ncurses.h>
+#include <optional>
 #include <pugixml.hpp>
 #include <string>
 #include <vector>
