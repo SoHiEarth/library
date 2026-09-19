@@ -52,7 +52,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y pugixml
+        sudo apt-get install -y libpugixml-dev
 
     - name: Install Dependencies (macOS)
       if: matrix.os == 'macos-latest'
