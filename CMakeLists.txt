@@ -19,6 +19,7 @@ find_package(pugixml REQUIRED)
 add_executable(lib)
 target_sources(lib PRIVATE
   src/main.cc
+  src/interface.cc
 )
 
 target_include_directories(lib PRIVATE include)
