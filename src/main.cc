@@ -24,8 +24,8 @@ public:
 
   void NewBook(std::string title, std::string author) {
     auto book_node = books_node.append_child("book");
-    book_node.append_attribute("title") = title;
-    book_node.append_attribute("author") = author;
+    book_node.append_attribute("title") = title.c_str();
+    book_node.append_attribute("author") = author.c_str();
     books_.push_back({title, author});
   }
 
