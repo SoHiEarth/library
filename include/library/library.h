@@ -56,8 +56,8 @@ public:
     books_node.remove_children();
     for (const auto &book : books_) {
       auto book_node = books_node.append_child("book");
-      book_node.append_attribute("title") = book.title;
-      book_node.append_attribute("author") = book.author;
+      book_node.append_attribute("title") = book.title.c_str();
+      book_node.append_attribute("author") = book.author.c_str();
     }
     doc.save_file(library_path.c_str());
   }

@@ -1,3 +1,4 @@
+#include <format>
 #include <ncurses.h>
 #include <optional>
 #include <pugixml.hpp>
