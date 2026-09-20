@@ -1,6 +1,6 @@
 #include "library/interface.h"
 #include "ncurses.h"
-#include <ios>
+#include <format>
 
 void Interface::AddText(Position position, std::string text, int style) {
   auto text_object = std::make_shared<Text>(position, text, style);
@@ -11,65 +11,55 @@ void Interface::AddButton(Position position, std::string text, int style,
                           const std::function<void()> &func) {
   auto button_object = std::make_shared<Button>(position, text, style, func);
   content_.push_back(button_object);
-  if (!buttons_.contains(position.y)) {
-    buttons_[position.y] = std::map<int, std::shared_ptr<Button>>();
-  }
-  buttons_[position.y][position.x] = button_object;
+  buttons_.push_back(button_object);
 }
 
 void Interface::HandleInput(int ch) {
   if (ch == KEY_UP) {
-    selected.y = std::max(0, selected.y - 1);
+    selected--;
   } else if (ch == KEY_DOWN) {
-    selected.y =
-        std::min(selected.y + 1, static_cast<int>(buttons_.size() - 1));
+    selected++;
   } else if (ch == KEY_LEFT) {
-    selected.x = std::max(0, selected.x - 1);
+    selected--;
   } else if (ch == KEY_RIGHT) {
-    selected.x = std::min(selected.x + 1,
-                          static_cast<int>(buttons_[selected.y].size() - 1));
-  } else if (ch == '\n') {
-    // Find the current button
-    if (!buttons_.empty()) {
-      // Find the current button
-      auto selected_x_map = std::next(buttons_.begin(), selected.y)->second;
-      auto current_button =
-          std::next(selected_x_map.begin(), selected.x)->second;
-      if (current_button)
-        current_button->func();
-    }
+    selected++;
   }
 
-  if (selected.y > static_cast<int>(buttons_.size() - 1)) {
-    selected.y = static_cast<int>(buttons_.size() - 1);
-  }
-  if (selected.x > static_cast<int>(buttons_[selected.y].size() - 1)) {
-    selected.x = static_cast<int>(buttons_[selected.y].size() - 1);
+  selected = std::clamp(selected, 0, static_cast<int>(buttons_.size()) - 1);
+
+  if (ch == '\n') {
+    auto current_button = buttons_.at(selected);
+    if (current_button) {
+      try {
+        current_button->func();
+      } catch (const std::exception &e) {
+        move(LINES - 1, 0);
+        clrtoeol();
+        mvaddstr(LINES - 1, 0, std::format("Error: {}", e.what()).c_str());
+        getch();
+      }
+    }
   }
 }
 
 void Interface::Draw() {
   clear();
   std::shared_ptr<Button> current_button;
-  if (selected.y > static_cast<int>(buttons_.size() - 1)) {
-    selected.y = static_cast<int>(buttons_.size() - 1);
-  }
-  if (selected.x > static_cast<int>(buttons_[selected.y].size() - 1)) {
-    selected.x = static_cast<int>(buttons_[selected.y].size() - 1);
-  }
-
   if (!buttons_.empty()) {
-    // Find the current button
-    auto selected_x_map = std::next(buttons_.begin(), selected.y)->second;
-    current_button = std::next(selected_x_map.begin(), selected.x)->second;
+    selected = std::clamp(selected, 0, static_cast<int>(buttons_.size()) - 1);
+    current_button = buttons_.at(selected);
   }
 
   if (current_button)
     current_button->style |= A_REVERSE;
 
   for (const auto text : content_) {
+    if (text->position.y < 0 || text->position.y > LINES ||
+        text->position.x < 0 || text->position.x > COLS) {
+      continue;
+    }
     attron(text->style);
-    mvprintw(text->position.y, text->position.x, text->text.c_str());
+    mvaddstr(text->position.y, text->position.x, text->text.c_str());
     attroff(text->style);
   }
   if (current_button)

@@ -2,21 +2,12 @@
 #define LIBRARY_INTERFACE_H
 
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 
 struct Position {
   int x = 0, y = 0;
 };
-
-inline bool operator<(const Position &p1, const Position &p2) {
-  if (p1.y != p2.y) {
-    return p1.y < p2.y;
-  } else {
-    return p1.x < p2.x;
-  }
-}
 
 struct Text {
   Position position;
@@ -38,9 +29,8 @@ struct Button : public Text {
 class Interface {
 private:
   std::vector<std::shared_ptr<Text>> content_;
-  // <y, <x, button>
-  std::map<int, std::map<int, std::shared_ptr<Button>>> buttons_;
-  Position selected;
+  std::vector<std::shared_ptr<Button>> buttons_;
+  int selected = 0;
 
 public:
   void AddText(Position position, std::string text, int style);

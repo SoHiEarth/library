@@ -16,39 +16,32 @@ int main() {
     return 1;
   }
 
+  std::setlocale(LC_ALL, "");
   initscr();
-  mvprintw(0, 0, "lib - A simple home library manager.");
-  mvprintw(1, 0, "Press any key to continue.");
-  mvprintw(2, 0, "Press Q to quit.");
   keypad(stdscr, TRUE);
 
   int ch = 0;
   Interface interface;
-  int line = 0;
-  interface.AddButton({0, line++}, "Add New Book", A_BOLD,
-                      [&library]() { library->NewBook("Title", "Author"); });
-  for (auto book : library->GetBooks()) {
-    interface.AddButton({0, line++},
-                        std::format("{} ({})", book.title, book.author), A_BOLD,
-                        [&library, book]() { library->RemoveBook(book); });
-  }
-  interface.Draw();
   while (true) {
+    interface.Reset();
+    int line = 0;
+    interface.AddButton({0, line++}, "Add New Book", A_BOLD, [&library]() {
+      library->NewBook("NewTitle", "NewAuthor");
+    });
+
+    interface.AddText({0, line}, "Title", A_UNDERLINE);
+    interface.AddText({20, line++}, "Author", A_UNDERLINE);
+    for (auto book : library->GetBooks()) {
+      interface.AddButton({0, line}, std::format("{}", book.title), A_BOLD,
+                          [&library, book]() { library->RemoveBook(book); });
+      interface.AddText({20, line++}, std::format("{}", book.author), A_ITALIC);
+    }
+    interface.Draw();
+
     auto ch = getch();
     if (ch == 'q')
       break;
     interface.HandleInput(ch);
-
-    interface.Reset();
-    int line = 0;
-    interface.AddButton({0, line++}, "Add New Book", A_BOLD,
-                        [&library]() { library->NewBook("Title", "Author"); });
-    for (auto book : library->GetBooks()) {
-      interface.AddButton(
-          {0, line++}, std::format("{} ({})", book.title, book.author), A_BOLD,
-          [&library, book]() { library->RemoveBook(book); });
-    }
-    interface.Draw();
   }
 
   library.reset();
