@@ -1,4 +1,5 @@
 #include "library/library.h"
+#include <algorithm>
 
 std::vector<Book> &Library::GetBooks() { return books_; }
 
