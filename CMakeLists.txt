@@ -19,6 +19,9 @@ find_package(pugixml REQUIRED)
 add_executable(lib)
 target_sources(lib PRIVATE
   src/main.cc
+  src/home.cc
+  src/shelf.cc
+  src/library.cc
   src/interface.cc
 )
 
