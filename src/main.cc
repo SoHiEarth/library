@@ -5,6 +5,7 @@
 #include "library/interface.h"
 #include "library/library.h"
 #include "library/tabs/home.h"
+#include "library/tabs/shelf.h"
 
 int main() {
   std::optional<Library> library;
@@ -25,10 +26,13 @@ int main() {
 
   while (true) {
     interface.Reset();
+    interface.DrawTabBar(current_tab);
     switch (current_tab) {
     case Tab::kHome:
       DrawHome(interface, library.value());
       break;
+    case Tab::kShelf:
+      DrawShelf(interface, library.value());
     default:
       break;
     }

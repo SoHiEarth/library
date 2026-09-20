@@ -4,19 +4,21 @@
 
 void Interface::AddText(Position position, std::string text, int style,
                         int flags) {
-  content_.push_back(std::make_shared<Text>(position, text, style));
+  content_.push_back(std::make_shared<Text>(position, text, style, flags));
 }
 
 void Interface::AddButton(Position position, std::string text, int style,
                           const std::function<void()> &func, int flags) {
-  auto button_object = std::make_shared<Button>(position, text, style, func);
+  auto button_object =
+      std::make_shared<Button>(position, text, style, func, flags);
   content_.push_back(button_object);
   buttons_.push_back(button_object);
 }
 
-void Interface::AddSeparator(int y, std::string separator) {
+void Interface::AddSeparator(int y, std::string separator, int flags) {
   for (int i = 0; i < COLS; i++) {
-    content_.push_back(std::make_shared<Text>(Position(i, y), separator, 0, 0));
+    content_.push_back(
+        std::make_shared<Text>(Position(i, y), separator, 0, flags));
   }
 }
 
@@ -46,6 +48,28 @@ void Interface::HandleInput(int ch) {
       }
     }
   }
+}
+
+void Interface::DrawTabBar(Tab &current_tab) {
+  if (!settings.simple_tab_bar)
+    AddSeparator(0, "-", kIgnoreSettings);
+  AddButton(
+      {1, 1}, "Home", (current_tab == Tab::kHome) ? A_BOLD : 0,
+      [&current_tab] { current_tab = Tab::kHome; }, kIgnoreSettings);
+  AddButton(
+      {6, 1}, "Shelf", (current_tab == Tab::kShelf) ? A_BOLD : 0,
+      [&current_tab] { current_tab = Tab::kShelf; }, kIgnoreSettings);
+  AddButton(
+      {12, 1}, "Search", (current_tab == Tab::kSearch) ? A_BOLD : 0,
+      [&current_tab] { current_tab = Tab::kSearch; }, kIgnoreSettings);
+  AddButton(
+      {19, 1}, "Notes", (current_tab == Tab::kNotes) ? A_BOLD : 0,
+      [&current_tab] { current_tab = Tab::kNotes; }, kIgnoreSettings);
+  AddButton(
+      {25, 1}, "Settings", (current_tab == Tab::kSettings) ? A_BOLD : 0,
+      [&current_tab] { current_tab = Tab::kSettings; }, kIgnoreSettings);
+  if (!settings.simple_tab_bar)
+    AddSeparator(2, "-", kIgnoreSettings);
 }
 
 void Interface::Draw() {

@@ -35,7 +35,8 @@ class InterfaceSettings {
 public:
   int left_padding = 3;
   int right_padding = 3;
-  int top_padding = 1;
+  int top_padding = 4;
+  bool simple_tab_bar = false;
 };
 
 class Interface {
@@ -46,11 +47,13 @@ private:
   int selected = 0;
 
 public:
-  void AddText(Position position, std::string text, int style, int flags = 0);
-  void AddButton(Position position, std::string text, int style,
-                 const std::function<void()> &func, int flags = 0);
-  void AddSeparator(int y, std::string character = "-");
+  void AddText(Position position, std::string text, int style = 0,
+               int flags = 0);
+  void AddButton(Position position, std::string text, int style = 0,
+                 const std::function<void()> &func = {}, int flags = 0);
+  void AddSeparator(int y, std::string character = "-", int flags = 0);
   void HandleInput(int ch);
+  void DrawTabBar(Tab &current_tab);
   void Draw();
   void Reset();
 
