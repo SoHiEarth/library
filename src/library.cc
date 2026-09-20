@@ -1,13 +1,13 @@
 #include "library/library.h"
-#include <algorithm>
 
 std::vector<Book> &Library::GetBooks() { return books_; }
 
 void Library::NewBook(std::string title, std::string author) {
-  if (std::find(books_.begin(), books_.end(), Book(title, author)) !=
-      books_.end()) {
-    throw std::runtime_error("A book with the same data exists!");
+  for (const auto &book : books_) {
+    if (book == Book(title, author))
+      throw std::runtime_error("A book with the same data exists!");
   }
+
   auto book_node = books_node.append_child("book");
   book_node.append_attribute("title") = title.c_str();
   book_node.append_attribute("author") = author.c_str();
